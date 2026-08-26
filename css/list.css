@@ -1,0 +1,188 @@
+/* ===================================================================
+ * list.css - 列表页样式
+ * =================================================================== */
+
+.list-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    background: var(--bg-1);
+    border: 1px solid var(--border-light);
+    border-bottom: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
+}
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.search-box {
+    position: relative;
+    width: 240px;
+}
+.search-box svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-3);
+    pointer-events: none;
+}
+.search-box .form-control {
+    padding-left: 34px;
+}
+.filter-select { width: 140px; }
+
+.list-table {
+    background: var(--bg-1);
+    border: 1px solid var(--border-light);
+    border-top: 0;
+    overflow-x: auto;
+}
+.list-table table { min-width: 800px; }
+.list-table thead th {
+    background: var(--bg-2);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
+}
+.list-table thead th.sortable { cursor: pointer; user-select: none; }
+.list-table thead th.sortable:hover { color: var(--primary); }
+.list-table thead th .sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; }
+.list-table thead th.sorted .sort-icon { opacity: 1; color: var(--primary); }
+
+.list-table tbody td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text-1);
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
+}
+.list-table tbody tr { transition: background 0.15s; }
+.list-table tbody tr:hover { background: var(--bg-2); }
+.list-table tbody tr.selected { background: var(--primary-light); }
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.user-cell .avatar { width: 32px; height: 32px; }
+.user-cell-info { display: flex; flex-direction: column; }
+.user-cell-name { font-weight: 500; color: var(--text-1); }
+.user-cell-sub { font-size: 12px; color: var(--text-3); }
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.actions .btn-icon { color: var(--text-3); }
+.actions .btn-icon:hover { color: var(--text-1); background: var(--bg-3); }
+.actions .btn-icon.danger:hover { color: var(--danger); background: var(--danger-light); }
+
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-3);
+}
+.empty-state svg { color: var(--text-3); margin-bottom: 12px; }
+.empty-state-title { font-size: 16px; color: var(--text-2); margin-bottom: 6px; }
+.empty-state-desc { font-size: 13px; }
+
+.bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-top: 1px solid var(--border-light);
+    font-size: 13px;
+}
+.bulk-bar .selected-count {
+    background: var(--primary);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+.bulk-bar .spacer { flex: 1; }
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--bg-1);
+    border: 1px solid var(--border-light);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.page-info { font-size: 13px; color: var(--text-3); }
+.page-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: var(--bg-1);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-ellipsis { padding: 0 4px; color: var(--text-3); font-size: 13px; }
+
+.page-size {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-3);
+}
+.page-size select { width: auto; min-width: 70px; height: 32px; padding: 0 8px; }
+
+@media (max-width: 768px) {
+    .list-toolbar { padding: 12px; }
+    .search-box { width: 100%; }
+    .toolbar-right { width: 100%; justify-content: flex-end; }
+    .user-cell-info { display: none; }
+    .pagination { padding: 12px; flex-direction: column; align-items: stretch; }
+    .page-controls { justify-content: center; }
+}
