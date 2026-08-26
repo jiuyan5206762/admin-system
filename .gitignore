@@ -1,0 +1,43 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build / dist
+dist/
+build/
+out/
+
+# Node (if user later adds package.json)
+node_modules/
+.pnpm-store/
+
+# Local data files
+*.local
+.env
+.env.local
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+
+# Coverage
+coverage/
+
+# Temporary
+*.tmp
+*.bak
