@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 · 管理后台</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-bg">
+            <div class="bg-shape shape-1"></div>
+            <div class="bg-shape shape-2"></div>
+            <div class="bg-shape shape-3"></div>
+        </div>
+        <div class="login-container">
+            <div class="login-info">
+                <div class="login-brand">
+                    <div class="brand-logo">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">管理后台</span>
+                </div>
+                <h1 class="login-headline">让管理更<br>简单高效</h1>
+                <p class="login-desc">一体化数据看板、用户管理、订单处理、内容运营，<br>让日常工作更轻松。</p>
+                <ul class="login-features">
+                    <li><span class="check-icon">✓</span>实时数据看板</li>
+                    <li><span class="check-icon">✓</span>权限分级管理</li>
+                    <li><span class="check-icon">✓</span>响应式设计，多端适配</li>
+                </ul>
+            </div>
+            <div class="login-form-wrap">
+                <div class="login-form">
+                    <h2 class="form-title">欢迎回来</h2>
+                    <p class="form-subtitle">使用账号密码登录后台</p>
+                    <form id="loginForm" autocomplete="off">
+                        <div class="form-item">
+                            <label class="form-label">账号</label>
+                            <input class="form-control" type="text" id="username" placeholder="请输入用户名" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">密码</label>
+                            <input class="form-control" type="password" id="password" placeholder="请输入密码" required>
+                        </div>
+                        <div class="form-row">
+                            <label class="checkbox">
+                                <input type="checkbox" id="remember" checked>
+                                <span>记住我</span>
+                            </label>
+                            <a href="#" class="link">忘记密码？</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="btnLogin">登 录</button>
+                        <div class="login-tip">
+                            <span>演示账号：admin / 123456</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/icons.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/feedback.js"></script>
+    <script>
+        if (Auth.getUser()) {
+            location.href = 'index.html';
+        }
+
+        // 自动填充记住的账号
+        Auth.fillRemembered();
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const btn = document.getElementById('btnLogin');
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+            await new Promise(r => setTimeout(r, 600));
+            const res = Auth.login(u, p, remember);
+            if (res.success) {
+                Toast.success('登录成功');
+                setTimeout(() => location.href = 'index.html', 400);
+            } else {
+                Toast.error(res.message || '登录失败');
+                btn.disabled = false;
+                btn.textContent = '登 录';
+            }
+        });
+    </script>
+</body>
+</html>
