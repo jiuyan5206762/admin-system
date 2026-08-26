@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>列表管理 - 管理后台</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/list.css">
+</head>
+<body>
+    <div class="app-layout" id="app"></div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/icons.js"></script>
+    <script src="../js/feedback.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/list.js"></script>
+    <script>
+        (function() {
+            // 解析 URL 参数确定列表类型
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type') || 'users';
+
+            const config = ListPage.getConfig(type);
+            if (!config) {
+                document.getElementById('app').innerHTML = '<div style="padding:40px;text-align:center">未知的列表类型</div>';
+                return;
+            }
+
+            // 挂载布局
+            Layout.mount(document.getElementById('app'), config.menuId, [
+                { text: '内容管理' },
+                { text: config.title }
+            ]);
+
+            // 渲染列表页
+            ListPage.render(config);
+        })();
+    </script>
+</body>
+</html>
