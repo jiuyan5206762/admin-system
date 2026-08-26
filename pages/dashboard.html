@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>数据看板 - 管理后台</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="app-layout" id="app"></div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/icons.js"></script>
+    <script src="../js/feedback.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        (function() {
+            // 挂载布局
+            Layout.mount(document.getElementById('app'), 'dashboard', [
+                { text: '数据看板' }
+            ]);
+
+            // 渲染内容
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <!-- 欢迎卡片 -->
+                <div class="welcome-card">
+                    <div class="welcome-content">
+                        <div class="welcome-title" id="welcomeText">早上好，${Auth.getUser().name} 👋</div>
+                        <div class="welcome-subtitle">今天是 ${new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}，祝你有美好的一天！</div>
+                    </div>
+                    <div class="welcome-stats">
+                        <div class="welcome-stat">
+                            <div class="welcome-stat-num" id="statUsers">--</div>
+                            <div class="welcome-stat-label">总用户数</div>
+                        </div>
+                        <div class="welcome-stat">
+                            <div class="welcome-stat-num" id="statArticles">--</div>
+                            <div class="welcome-stat-label">文章数</div>
+                        </div>
+                        <div class="welcome-stat">
+                            <div class="welcome-stat-num" id="statOrders">--</div>
+                            <div class="welcome-stat-label">订单数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核心数据 -->
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-label">总访问量</div>
+                            <div class="stat-icon">${Icons.eye}</div>
+                        </div>
+                        <div class="stat-value" id="kpi1">--</div>
+                        <div class="stat-trend up">
+                            <span class="trend-arrow">${Icons.arrowUp}</span>
+                            <span>较上周 +12.5%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-header">
+                            <div class="stat-label">新增用户</div>
+                            <div class="stat-icon">${Icons.user}</div>
+                        </div>
+                        <div class="stat-value" id="kpi2">--</div>
+                        <div class="stat-trend up">
+                            <span class="trend-arrow">${Icons.arrowUp}</span>
+                            <span>较上周 +8.2%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-header">
+                            <div class="stat-label">订单总额</div>
+                            <div class="stat-icon">${Icons.order}</div>
+                        </div>
+                        <div class="stat-value" id="kpi3">--</div>
+                        <div class="stat-trend up">
+                            <span class="trend-arrow">${Icons.arrowUp}</span>
+                            <span>较上周 +24.1%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-header">
+                            <div class="stat-label">异常事件</div>
+                            <div class="stat-icon">${Icons.alert}</div>
+                        </div>
+                        <div class="stat-value" id="kpi4">--</div>
+                        <div class="stat-trend down">
+                            <span class="trend-arrow">${Icons.arrowDown}</span>
+                            <span>较上周 -3.4%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区 -->
+                <div class="chart-row">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">访问趋势</div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-sm btn-secondary chart-tab active" data-range="7">近 7 天</button>
+                                <button class="btn btn-sm btn-secondary chart-tab" data-range="30">近 30 天</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot primary"></div><span>访问量</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot success"></div><span>独立访客</span>
+                                </div>
+                            </div>
+                            <div class="chart-container" id="barChart"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">分类占比</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="pie-container" id="pieChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 活动 + 快捷 -->
+                <div class="chart-row" style="grid-template-columns: 2fr 1fr">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">最近活动</div>
+                            <a href="list.html?type=users" class="btn btn-sm btn-ghost">查看全部 ${Icons.chevronRight}</a>
+                        </div>
+                        <div class="card-body">
+                            <ul class="activity-list" id="activityList"></ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">快捷入口</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-grid">
+                                <a class="quick-item" href="list.html?type=users">
+                                    <div class="quick-icon">${Icons.user}</div>
+                                    <div class="quick-label">添加用户</div>
+                                </a>
+                                <a class="quick-item" href="list.html?type=articles">
+                                    <div class="quick-icon">${Icons.plus}</div>
+                                    <div class="quick-label">新建文章</div>
+                                </a>
+                                <a class="quick-item" href="list.html?type=orders">
+                                    <div class="quick-icon">${Icons.order}</div>
+                                    <div class="quick-label">查看订单</div>
+                                </a>
+                                <a class="quick-item" href="javascript:void(0)" onclick="Toast.info('数据导出功能')">
+                                    <div class="quick-icon">${Icons.download}</div>
+                                    <div class="quick-label">导出数据</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 填充数据
+            const users = Storage.get('users') || [];
+            const articles = Storage.get('articles') || [];
+            const orders = Storage.get('orders') || [];
+            const activities = Storage.get('activities') || [];
+
+            document.getElementById('statUsers').textContent = users.length;
+            document.getElementById('statArticles').textContent = articles.length;
+            document.getElementById('statOrders').textContent = orders.length;
+
+            const totalAmount = orders.reduce((sum, o) => sum + o.amount, 0);
+            document.getElementById('kpi1').textContent = (users.length * 123 + 8765).toLocaleString();
+            document.getElementById('kpi2').textContent = (users.length + 8).toString();
+            document.getElementById('kpi3').textContent = '¥' + totalAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('kpi4').textContent = '12';
+
+            // 渲染活动列表
+            const activityIcons = {
+                user: Icons.user, check: Icons.check, edit: Icons.edit,
+                mail: Icons.mail, alert: Icons.alert
+            };
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = activities.map(a => `
+                <li class="activity-item">
+                    <div class="activity-icon ${a.type}">${activityIcons[a.icon] || Icons.file}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${a.text}</div>
+                        <div class="activity-meta">${a.time}</div>
+                    </div>
+                </li>
+            `).join('');
+
+            // 渲染柱状图
+            function renderBarChart(days) {
+                const labels = days === 7
+                    ? ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                    : Array.from({ length: 30 }, (_, i) => (i + 1) + '日');
+
+                const data1 = labels.map(() => Math.floor(Math.random() * 800 + 200));
+                const data2 = labels.map(() => Math.floor(Math.random() * 500 + 100));
+                const maxVal = Math.max(...data1, ...data2) * 1.2;
+
+                const chart = document.getElementById('barChart');
+                // 限制显示的柱子数量（30天只显示部分标签）
+                const showLabel = days === 7 || labels.length <= 10 || labels.length % 5 === 0;
+
+                chart.innerHTML = `
+                    <div class="bar-chart">
+                        ${data1.map((v, i) => {
+                            const h1 = (v / maxVal) * 200;
+                            const h2 = (data2[i] / maxVal) * 200;
+                            const showThisLabel = days === 7 || (i % 5 === 0);
+                            return `
+                                <div class="bar-group">
+                                    <div class="bar-pair">
+                                        <div class="bar primary" style="height:${h1}px">
+                                            <div class="bar-value">${v}</div>
+                                        </div>
+                                        <div class="bar success" style="height:${h2}px">
+                                            <div class="bar-value">${data2[i]}</div>
+                                        </div>
+                                    </div>
+                                    ${showThisLabel ? `<div class="bar-label">${labels[i]}</div>` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+            renderBarChart(7);
+
+            // 切换时间范围
+            document.querySelectorAll('.chart-tab').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderBarChart(parseInt(this.getAttribute('data-range')));
+                });
+            });
+
+            // 渲染饼图（按部门统计）
+            const deptCount = {};
+            users.forEach(u => { deptCount[u.department] = (deptCount[u.department] || 0) + 1; });
+            const deptEntries = Object.entries(deptCount).sort((a, b) => b[1] - a[1]);
+            const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'];
+            const total = users.length;
+
+            let cumAngle = 0;
+            const radius = 70;
+            const cx = 90, cy = 90;
+            const segments = deptEntries.map(([dept, count], i) => {
+                const angle = (count / total) * 360;
+                const startAngle = cumAngle;
+                const endAngle = cumAngle + angle;
+                cumAngle = endAngle;
+
+                // 计算 SVG 弧形路径
+                const startRad = (startAngle - 90) * Math.PI / 180;
+                const endRad = (endAngle - 90) * Math.PI / 180;
+                const x1 = cx + radius * Math.cos(startRad);
+                const y1 = cy + radius * Math.sin(startRad);
+                const x2 = cx + radius * Math.cos(endRad);
+                const y2 = cy + radius * Math.sin(endRad);
+                const largeArc = angle > 180 ? 1 : 0;
+                const path = `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+
+                return { path, color: colors[i % colors.length], dept, count, percent: ((count / total) * 100).toFixed(1) };
+            });
+
+            document.getElementById('pieChart').innerHTML = `
+                <div class="pie-chart">
+                    <svg width="180" height="180" viewBox="0 0 180 180">
+                        ${segments.map(s => `<path d="${s.path}" fill="${s.color}" stroke="#fff" stroke-width="2"/>`).join('')}
+                    </svg>
+                    <div class="pie-center">
+                        <div class="pie-center-num">${total}</div>
+                        <div class="pie-center-label">总人数</div>
+                    </div>
+                </div>
+                <div class="pie-legend">
+                    ${segments.map(s => `
+                        <div class="pie-legend-item">
+                            <div class="left">
+                                <div class="color-dot" style="background:${s.color}"></div>
+                                <span>${s.dept}</span>
+                            </div>
+                            <div><span class="value">${s.count}</span> <span class="text-muted" style="font-size:11px">${s.percent}%</span></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        })();
+    </script>
+</body>
+</html>
