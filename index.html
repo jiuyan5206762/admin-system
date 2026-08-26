@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/list.css">
+    <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <script src="js/icons.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/list.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/settings.js"></script>
+    <script>
+        if (!Auth.getUser()) {
+            location.href = 'login.html';
+        }
+
+        function go(path) {
+            ListPage.render(ListPage.getConfig(path));
+        }
+
+        const routes = {
+            'dashboard': () => Dashboard.render(),
+            'users':     () => go('users'),
+            'orders':    () => go('orders'),
+            'products':  () => go('products'),
+            'articles':  () => go('articles'),
+            'messages':  () => go('messages'),
+            'settings':  () => Settings.render()
+        };
+
+        const breadcrumbMap = {
+            'dashboard': [{ text: '数据看板' }],
+            'users':     [{ text: '用户管理' }, { text: '用户列表' }],
+            'orders':    [{ text: '订单管理' }, { text: '订单列表' }],
+            'products':  [{ text: '商品管理' }, { text: '商品列表' }],
+            'articles':  [{ text: '内容管理' }, { text: '文章列表' }],
+            'messages':  [{ text: '消息中心' }, { text: '消息列表' }],
+            'settings':  [{ text: '系统设置' }]
+        };
+
+        function router() {
+            const hash = (location.hash || '#/dashboard').replace(/^#\/?/, '');
+            const handler = routes[hash] || routes['dashboard'];
+            document.getElementById('app').innerHTML = Layout.render(hash, breadcrumbMap[hash] || []);
+            Layout.bind();
+            handler();
+        }
+        window.addEventListener('hashchange', router);
+        router();
+
+        try {
+            const data = JSON.parse(localStorage.getItem('admin_settings') || '{}');
+            if (data.prefs) {
+                if (data.prefs.primaryColor) document.documentElement.style.setProperty('--primary', data.prefs.primaryColor);
+                if (data.prefs.theme) document.documentElement.setAttribute('data-theme-mode', data.prefs.theme);
+            }
+        } catch (e) {}
+    </script>
+</body>
+</html>
